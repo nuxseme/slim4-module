@@ -1,0 +1,22 @@
+{
+    "name": "slim4-module/slim4-module",
+    "type": "library",
+    "description": "slim4 module",
+    "keywords": ["slim module"],
+    "homepage": "http://nuxseme.com",
+    "license": "MIT",
+    "authors": [
+        {"name": "nuxseme", "email": "nuxseme@gmail.com"}
+    ],
+    "require-dev": {
+        "php-di/php-di": "^6.1",
+        "slim/psr7": "^1.1",
+        "slim/slim": "^4.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Slim4\\Module\\": "src"
+        }
+    }
+
+}
