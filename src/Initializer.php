@@ -20,7 +20,7 @@ class Initializer
     /**
      * @var AbstractModule
      */
-    protected $moduleInstances;
+    protected $moduleInstance;
 
     protected $classLoader;
 
@@ -41,21 +41,28 @@ class Initializer
         }
         $path = rtrim($path,'/');
         $path = explode('/',$path);
-        if(count($path) >= 4) {
-            $module = ucfirst($path[1]);
-            $this->classLoader->setPsr4($module."\\", $this->moduleDir.'/'.$module);
-            $moduleName = '\\'.$module.'\\'.$module.'Module';
-            if(class_exists($moduleName)) {
-                $this->moduleInstances = new $moduleName();
-                $this->dispatch();
-                unset($path[1]);
-                $Uri = $request->getUri()->withPath(implode('/',$path));
-                $request = $request->withUri($Uri);
-            }
+        $module = ucfirst($path[1]);
+        $this->classLoader->setPsr4($module."\\", $this->moduleDir.'/'.$module);
+        $moduleName = '\\'.$module.'\\'.$module.'Module';
+        if(class_exists($moduleName)) {
+            $this->moduleInstance = new $moduleName();
+            $this->dispatch();
+            unset($path[1]);
+            $Uri = $request->getUri()->withPath(implode('/',$path));
+            $request = $request->withUri($Uri);
         }
 
         return $request;
     }
+
+    /**
+     * @return AbstractModule
+     */
+    public function getModuleInstance(): AbstractModule
+    {
+        return $this->moduleInstance;
+    }
+
     public function dispatch()
     {
         $this->initDependencies();
@@ -65,7 +72,7 @@ class Initializer
 
     public function getModuleConfig()
     {
-        return $this->moduleInstances->getModuleConfig();
+        return $this->moduleInstance->getModuleConfig();
     }
 
     public function initModuleConfig()
@@ -84,17 +91,17 @@ class Initializer
     public function initDependencies()
     {
         $container = $this->app->getContainer();
-        $this->moduleInstances->initDependencies($container);
+        $this->moduleInstance->initDependencies($container);
     }
 
 
     public function initMiddleware()
     {
-        $this->moduleInstances->initMiddleware($this->app);
+        $this->moduleInstance->initMiddleware($this->app);
     }
 
     public function initRoutes()
     {
-        $this->moduleInstances->initRoutes($this->app);
+        $this->moduleInstance->initRoutes($this->app);
     }
 }
