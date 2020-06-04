@@ -41,14 +41,15 @@ class Initializer
         }
         $path = rtrim($path,'/');
         $path = explode('/',$path);
-        if(count($path) == 4) {
+        if(count($path) >= 4) {
             $module = ucfirst($path[1]);
             $this->classLoader->setPsr4($module."\\", $this->moduleDir.'/'.$module);
             $moduleName = '\\'.$module.'\\'.$module.'Module';
             if(class_exists($moduleName)) {
                 $this->moduleInstances = new $moduleName();
                 $this->dispatch();
-                $Uri = $request->getUri()->withPath('/'.$path[2].'/'.$path[3]);
+                unset($path[1]);
+                $Uri = $request->getUri()->withPath(implode('/',$path));
                 $request = $request->withUri($Uri);
             }
         }
